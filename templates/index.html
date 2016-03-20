@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#button").click(function() {
+                    var input_string = $("#forminput").val();
+                    $.ajax({
+                        url : "/searh_json/", 
+                        type : "POST",
+                        dataType: "html", 
+                        data : {
+                            client_response : input_string,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                        success : function(result) {
+						    document.getElementById("result").innerHTML = result
+                            
+                        },
+                        error : function(xhr,errmsg,err) {
+                            alert(xhr.status + ": " + xhr.responseText);
+                        }
+                    });
+                    return false;
+            });
+			$("#imbutton").click(function() {
+                    var input_string = $("#forminput").val();
+					
+					document.getElementById("imresult").innerHTML =  "<img src='/static/images/loading.gif' style='width:25px;height:25px;'>  Importing data to database";
+                    $.ajax({
+                        url : "/import/", 
+                        type : "POST",
+                        dataType: "json", 
+                        data : {
+                            client_response : input_string,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                        success : function(json) {
+                            document.getElementById("imresult").innerHTML = "Imported Data";
+                        },
+                        error : function(xhr,errmsg,err) {
+                            alert(xhr.status + ": " + xhr.responseText);
+                        }
+                    });
+                    return false;
+            });
+        });
+</script>
+<table style="width:100%">
+	<tr>
+		<td style="width:85%">
+			<img src="/static/images/python.png" style="width:80px;height:80px;">
+		</td>
+		<td style="width:15%">
+			<b>Data Management</b>
+				<form method="post" name="import form" >
+					{% csrf_token %}
+					<input id="imbutton" type="button" value="Import Data"></input>
+				<div id="imresult"></div>
+				</form>
+		</td>
+	</tr>
+</table>
+
+<table style="width:100%">
+  <tr><td align="center"><img src="/static/images/logo.png" style="width:160px;height:80px;"><br>Mini Search Engine</td></tr>
+  <tr>
+    <td align="center">
+	<form method="post" name="search form">
+        {% csrf_token %}
+        <input name="inputtxt" id="forminput" type="text" size="75">
+        <input id="button" type="button" value="search"></input>
+    </form>
+	</td>
+  </tr>
+  
+</table>
+<div id="result"></div>
+</body>
+</html>
